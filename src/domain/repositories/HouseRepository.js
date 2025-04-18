@@ -23,6 +23,15 @@ class HouseRepository {
         return newPoints;
     }
 
+    restartHousePoints(name) {
+        const house = this.getHouseByName(name);
+        if (!house) {
+            throw new Error('House not found');
+        }
+        const newPoints = house.restartPoints();
+        return newPoints;
+    }
+
     getAllHouses() {
         return Object.values(this.houses);
     }

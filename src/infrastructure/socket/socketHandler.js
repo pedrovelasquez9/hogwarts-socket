@@ -4,6 +4,7 @@ const HouseRepository = require('../../domain/repositories/HouseRepository');
 const ConnectUser = require('../../use-cases/ConnectUser');
 const IncrementHousePoints = require('../../use-cases/IncrementHousePoints');
 const User = require('../../domain/entities/User');
+const RestartHousePoints = require('../../use-cases/RestartHousePoints');
 
 function initializeSocket(server) {
     const io = new Server(server, {
@@ -17,6 +18,7 @@ function initializeSocket(server) {
     const houseRepository = new HouseRepository();
     const connectUser = new ConnectUser(userRepository);
     const incrementHousePoints = new IncrementHousePoints(houseRepository);
+    const restartHousePoints = new RestartHousePoints(houseRepository);
 
     io.on('connection', (socket) => {
         console.log(`New connection: ${socket.id}`);
@@ -43,6 +45,17 @@ function initializeSocket(server) {
                 callback({ status: 'error', message: error.message });
             }
         });
+
+        socket.on('restart', (data, callback) => {
+            const { houseName } = data;
+            try {
+                const newPoints = restartHousePoints.execute(houseName);
+                io.emit('pointsUpdate', { houseName, newPoints });
+                callback({ status: 'ok', newPoints });
+            } catch (error) {
+                callback({ status: 'error', message: error.message });
+            }
+        })
 
         socket.on('disconnect', () => {
             console.log(`socket disconnection: ${socket.id}`);
