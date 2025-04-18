@@ -13,6 +13,11 @@ class House {
         }
         return this.points;
     }
+
+    restartPoints() {
+        this.points = 0;
+        return this.points;
+    }
 }
 
 module.exports = House;
